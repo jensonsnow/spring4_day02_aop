@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd">  
+
+
+	<bean id="productDao" class="com.itheima.spring.demo3.ProductDaoImpl">
+	</bean>
+	
+	<bean id="myAspect" class="com.itheima.spring.demo3.MyAspectXML" />
+	 
+	 
+	 <!-- 通过AOP的配置完成对目标类产生代理 -->
+	<aop:config>  					   <!-- * 代表任意方法返回值    [访问修饰符] 方法返回值  包名.类名.方法名(参数)  -->
+		<aop:pointcut expression="execution(* com.itheima.spring.demo3.ProductDaoImpl.save(..))" id="pointcut1"/>
+		<aop:pointcut expression="execution(* com.itheima.spring.demo3.ProductDaoImpl.delete(..))" id="pointcut2"/>
+		<aop:pointcut expression="execution(* com.itheima.spring.demo3.ProductDaoImpl.update(..))" id="pointcut3"/>
+		<aop:pointcut expression="execution(* com.itheima.spring.demo3.ProductDaoImpl.find(..))" id="pointcut4"/>
+		
+		
+		<!-- 配置切面 -->
+		<aop:aspect ref="myAspect"  >
+			<!-- aop:before为前置通知 -->
+			<aop:before method="checkPri" pointcut-ref="pointcut1" />
+			
+			<!-- after-returning为后置通知   可以获得方法的返回值 -->
+			<aop:after-returning method="writeLog" pointcut-ref="pointcut2" returning="result" />
+			
+			<!-- aop:around为环绕通知     -->
+			<aop:around method="around" pointcut-ref="pointcut3"   />
+			
+			<!-- after-throwing为异常抛出通知     -->
+			<aop:after-throwing method="afterThrowing" pointcut-ref="pointcut4"  throwing="ex" />
+			
+			<!-- after 为最终通知    无论程序有没有异常  都会执行 -->
+			<aop:after method="after" pointcut-ref="pointcut4"  />
+			
+		</aop:aspect>
+		
+	</aop:config>
+</beans>
